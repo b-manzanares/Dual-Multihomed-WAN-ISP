@@ -2,7 +2,7 @@
 
 ## 🎯 Objective
 
-This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. 
+This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. The question I was trying to answer was "how would you create a redundant network, that provides access to the internet even if an ISP goes down?"
 
 * Configured eBGP and iBGP for dynamic routing & redundancy.
 * Manipulated path selection via local preference and AS-path prepending.
@@ -70,6 +70,32 @@ inserthostname-here(config)#do sh bgp
 + *>   1.1.1.1/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
 + *>   2.2.2.2/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
 ```
+### 2. Verification of BGP Neighbor States
+
+Running show ip bgp summary confirms that peerings are properly established (State/PfxRcd shows a numerical value of prefixes received rather than an active state like Active or Idle).
+
+inserthostname-here(config)#do sh ip bgp sum
+
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+158.0.35.161    4       650001      64      62       32    0    0 00:48:28        8
+175.0.35.253    4       650002      19      19       32    0    0 00:06:40       13
+
+### 3. BFD Session Verification
+
+Verify sub-second path tracking state across the shared Layer 2 switch network. We see here that the Holdown is in miliseconds, allowing for faster convergence and almost instant fail-over. Sometimes this is needed in the case of a switch connecting two routers. Unless the routers are directly connected they will not know that others links went down until OSPF and BGP dead timers hit 0, which can be a long time by default. 
+
+```diff
+
+NeighAddr                              LD/RD         RH/RS     State     Int
+200.0.2.254                             1/1          Up        Up        Gi0/1
++Session state is UP and using echo function with 300 ms interval.
+Session Host: Software
+OurAddr: 200.0.2.253
+Handle: 1
+Local Diag: 0, Demand mode: 0, Poll bit: 0
++MinTxInt: 1000000, MinRxInt: 1000000, Multiplier: 3
+
+``` 
 
 ### 1. NAT Translation Verification
 Verify that the Gateway Router is actively translating private IP traffic to public-ready flows:
