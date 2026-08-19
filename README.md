@@ -37,7 +37,7 @@ Internal Core Switch: Core-L3-Switch.txt — Manages LAN routing and HSRP gatewa
 Service Provider Gateway A: ISP-A-Router.txt — Simulates primary upstream ISP peering. <br>
 Service Provider Gateway B: ISP-B-Router.txt — Simulates secondary backup ISP peering. <br>
 
-##☑️Configuration & Verification Snippets
+## ☑️Configuration & Verification Snippets
 
 ### 1. Inbound Path Control via AS-Path Prepending
 
@@ -53,7 +53,6 @@ router bgp 65000
  neighbor 173.58.16.162 route-map PREPEND-ISP-B out
 ```
 We use outbound here because we want routers on the ISP side to believe that it is a longer path to Edge-Router-02, influencing the path selection.  
-## 🔍 Validation & Verification Commands
 
 ### 1. NAT Translation Verification
 Verify that the Gateway Router is actively translating private IP traffic to public-ready flows:
