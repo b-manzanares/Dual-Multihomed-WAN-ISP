@@ -1,6 +1,6 @@
 # Dual-Multihomed-WAN-ISP
 
-🚀## Objective
+🎯## Objective
 
 This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. 
 
@@ -9,7 +9,7 @@ This project simulates an enterprise network connecting to two Internet Service 
 * Built automatic fail-over mechanisms to maintain uptime during link or switch failures.
 * Verified and tested network resilience and resource availability.
 
-## Skills Learned
+📖## Skills Learned
 
 * Advanced eBGP and iBGP configuration
 * Analyzing and interpreting verification commands
@@ -18,15 +18,16 @@ This project simulates an enterprise network connecting to two Internet Service 
 * Multi-homed Dual WAN setups
 * Network troubleshooting
 
-## Tools & Technologies Used
+🛠️## Tools & Technologies Used
 
 * Verification commands
 * Prefix lists and route maps
 * Bidirectional Forwarding Detection (BFD)
 
-Topology Diagram
+🗺️Topology Diagram
 
-[Below is the structural layout of the simulated enterprise edge environment, showcasing dual connections to ISP-A and ISP-B.(Note: Replace this with your actual image file name once uploaded to your repository)]
+[Below is the structural layout of the simulated enterprise edge environment, showcasing dual multihomed wan/isp setup]
+<img width="1853" height="963" alt="topology" src="https://github.com/user-attachments/assets/2f35b3c9-7114-4a63-acf6-5b4531c395fd" />
 
 Device Configurations
 
