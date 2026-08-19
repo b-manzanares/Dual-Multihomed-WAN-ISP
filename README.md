@@ -52,7 +52,24 @@ route-map AS_prepend permit 20
 router bgp 65000
  neighbor 173.58.16.162 route-map PREPEND-ISP-B out
 ```
-We use outbound here because we want routers on the ISP side to believe that it is a longer path to Edge-Router-02, influencing the path selection.  
+We use outbound at the end of the route-map because we want routers on the ISP side to believe that it is a longer path to Edge-Router-02, influencing the path selection. Here is the result ISP-A is preferred.  
+
+```text
+inserthostname-here(config)#do sh bgp
+
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>   1.1.1.1/32       175.0.35.253                           0 650002 65000 i
+ *>   2.2.2.2/32       175.0.35.253                           0 650002 65000 i
+```
+Now if we shutdown the link to ISP-A our route to ISP-B takes over and shows ups the Path. Here is the output 
+
+```diff
+inserthostname-here(config)#do sh bgp
+
+     Network          Next Hop            Metric LocPrf Weight Path
++ *>   1.1.1.1/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
++ *>   2.2.2.2/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
+```
 
 ### 1. NAT Translation Verification
 Verify that the Gateway Router is actively translating private IP traffic to public-ready flows:
