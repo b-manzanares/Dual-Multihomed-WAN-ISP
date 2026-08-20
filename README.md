@@ -2,7 +2,7 @@
 
 ## 🎯 Objective
 
-This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. This typically happens when a company owns their IP addresses and an AS number, and need to provide their IP's to both ISPs in case one fails. The question I was trying to answer was "how would you create a redundant network, that provides access to the internet even if an ISP goes down?"
+This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. This typically happens when a company owns a /24 block of public ip addresses and an AS number, and need to provide their IP's to both ISPs, so they can dynamically discover routes. The question I was trying to answer was "how would you create a redundant network, that provides access to the internet even if an ISP goes down?"
 
 * Configured eBGP and iBGP for dynamic routing & redundancy.
 * Manipulated path selection via local preference and AS-path prepending.
@@ -43,7 +43,7 @@ Service Provider Gateway B: ISP-B-Router.txt — Simulates secondary backup ISP 
 
 ### 1. Inbound Path Control via AS-Path Prepending
 
-To prevent ISP-B from being used for inbound corporate traffic during normal operations, the secondary edge router prepends its Autonomous System (AS) number three times to advertisements sent to ISP-B. We might wish to alter how traffic arrives from the internet, since an ISP could charge more money or the firewall could block packets on the return trip if we have stateful connections, meaning any connection that wasn't previously established is assumed to be malicious. 
+To prevent ISP-B from being used for inbound corporate traffic during normal operations, the secondary edge router prepends its Autonomous System (AS) number three times to advertisements sent to ISP-B. We might wish to alter how traffic arrives from the internet, since an ISP could charge more money or a stateful firewall could block packets on the return trip, because any connection that wasn't previously established is assumed to be malicious. 
 
 ```text
 ! Configuration on edge-router-02
