@@ -27,7 +27,9 @@ This project simulates an enterprise network connecting to two Internet Service 
 ## 🗺️ Topology Diagram
 
 [Below is the structural layout of the simulated enterprise edge environment, showcasing dual multihomed wan/isp setup]
-<img width="1853" height="963" alt="topology" src="https://github.com/user-attachments/assets/2f35b3c9-7114-4a63-acf6-5b4531c395fd" />
+
+<img width="1853" height="963" alt="topology" src="https://github.com/user-attachments/assets/62bc73e5-79e3-4771-826f-765e909d55ab" />
+
 
 ## Device Configurations
 
