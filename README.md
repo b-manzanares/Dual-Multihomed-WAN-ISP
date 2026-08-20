@@ -55,7 +55,7 @@ router bgp 65000
  neighbor 173.58.16.162 route-map route-map AS_prepend out
 ```
 
-We use outbound at the end of the route-map because we want routers on the ISP side to believe that it is a longer path to AS 65000 (lo), influencing which path is considered better. If we check the output we see AS 650002 listed as part of the path to network 1.1.1.1 & 2.2.2.2 our edge router 1 and 2 respectively.  
+We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS 65000 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS 650002 (ISP-A) listed as part of the path to network 1.1.1.1 & 2.2.2.2, our edge router 1 and 2 respectively.  
 
 ```text
 inserthostname-here(config)#do sh bgp
@@ -64,7 +64,8 @@ inserthostname-here(config)#do sh bgp
  *>   1.1.1.1/32       175.0.35.253                           0 650002 65000 i
  *>   2.2.2.2/32       175.0.35.253                           0 650002 65000 i
 ```
-Now if we shutdown the link to ISP-A our route to ISP-B takes over and shows up in the Path. We see the path includes AS 650001, the Autonomous system ISP-B belongs too. Here is the output: 
+
+Now if we shutdown the link to ISP-A (ASp650002), our route to ISP-B (AS-650001) takes over and shows up in the path. We see the path includes AS 650001, the Autonomous system ISP-B belongs too. Here is the output: 
 
 ```diff
 inserthostname-here(config)#do sh bgp
@@ -77,6 +78,7 @@ inserthostname-here(config)#do sh bgp
 ### 2. Verification of BGP Neighbor States
 
 Running show ip bgp summary confirms that peerings are properly established (State/PfxRcd shows a numerical value of prefixes received rather than an active state like Active or Idle).
+
 ```text
 inserthostname-here(config)#do sh ip bgp sum
 
@@ -86,7 +88,7 @@ Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State
 ```
 ### 3. BFD Session Verification
 
-Verify sub-second path tracking state across the shared Layer 2 switch network. We see here that packets are being sent at 300 ms with a multiplier 3, allowing for faster convergence and almost instant fail-over. Sometimes this is needed in the case of a switch connecting two routers. Unless the routers are directly connected they will not know that others links went down until OSPF or BGP dead timers hit 0, which can be a long time by default. 
+Verify sub-second path tracking state across the shared Layer 2 switch network. We see here that packets are being sent at 300 ms with a multiplier 3, allowing for faster convergence and almost instant fail-over. Sometimes this is needed in the case of a switch connecting two routers. Unless the routers are directly connected, they will not know that others links went down until OSPF or BGP dead timers hit 0, which can be a long time by default. 
 
 ```diff
 
@@ -102,7 +104,7 @@ Local Diag: 0, Demand mode: 0, Poll bit: 0
 ``` 
 
 ### 1. NAT Translation Verification
-Verify that the Gateway Router is actively translating private IP traffic to public-ready flows:
+Verify that the Gateway Router is actively translating private IP traffic to public-ready flows, since private IP's can't be routed over the internet:
 ```text
 Gateway Router(config)#do sh ip nat translations
 
