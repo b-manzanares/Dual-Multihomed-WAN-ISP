@@ -2,7 +2,7 @@
 
 ## 🎯 Objective
 
-This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. The question I was trying to answer was "how would you create a redundant network, that provides access to the internet even if an ISP goes down?"
+This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. This typically happens when a company owns their IP addresses and an AS number, and need to provide their IP's to both ISPs in case one fails. The question I was trying to answer was "how would you create a redundant network, that provides access to the internet even if an ISP goes down?"
 
 * Configured eBGP and iBGP for dynamic routing & redundancy.
 * Manipulated path selection via local preference and AS-path prepending.
@@ -43,7 +43,7 @@ Service Provider Gateway B: ISP-B-Router.txt — Simulates secondary backup ISP 
 
 ### 1. Inbound Path Control via AS-Path Prepending
 
-To prevent ISP-B from being used for inbound corporate traffic during normal operations, the secondary edge router prepends its Autonomous System (AS) number three times to advertisements sent to ISP-B. We might wish to alter how traffic arrives from the internet, since an ISP could cost less or if we have stateful connections the traffic could be blocked on the return trip if the firewall hasn't seen an already established connection. 
+To prevent ISP-B from being used for inbound corporate traffic during normal operations, the secondary edge router prepends its Autonomous System (AS) number three times to advertisements sent to ISP-B. We might wish to alter how traffic arrives from the internet, since an ISP could charge more money or the firewall could block packets on the return trip if we have stateful connections, meaning any connection that wasn't previously established is assumed to be malicious. 
 
 ```text
 ! Configuration on edge-router-02
@@ -52,9 +52,10 @@ route-map AS_prepend permit 20
  set as-path prepend 65000 65000 65000
 !
 router bgp 65000
- neighbor 173.58.16.162 route-map PREPEND-ISP-B out
+ neighbor 173.58.16.162 route-map route-map AS_prepend out
 ```
-We use outbound at the end of the route-map because we want routers on the ISP side to believe that it is a longer path to Edge-Router-02, influencing the path selection. Here is the result ISP-A is preferred.  
+
+We use outbound at the end of the route-map because we want routers on the ISP side to believe that it is a longer path to AS 65000 (lo), influencing which path is considered better. If we check the output we see AS 650002 listed as part of the path to network 1.1.1.1 & 2.2.2.2 our edge router 1 and 2 respectively.  
 
 ```text
 inserthostname-here(config)#do sh bgp
@@ -63,7 +64,7 @@ inserthostname-here(config)#do sh bgp
  *>   1.1.1.1/32       175.0.35.253                           0 650002 65000 i
  *>   2.2.2.2/32       175.0.35.253                           0 650002 65000 i
 ```
-Now if we shutdown the link to ISP-A our route to ISP-B takes over and shows ups the Path. Here is the output 
+Now if we shutdown the link to ISP-A our route to ISP-B takes over and shows up in the Path. We see the path includes AS 650001, the Autonomous system ISP-B belongs too. Here is the output: 
 
 ```diff
 inserthostname-here(config)#do sh bgp
@@ -72,19 +73,20 @@ inserthostname-here(config)#do sh bgp
 + *>   1.1.1.1/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
 + *>   2.2.2.2/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
 ```
+
 ### 2. Verification of BGP Neighbor States
 
 Running show ip bgp summary confirms that peerings are properly established (State/PfxRcd shows a numerical value of prefixes received rather than an active state like Active or Idle).
-
+```text
 inserthostname-here(config)#do sh ip bgp sum
 
 Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-158.0.35.161    4       650001      64      62       32    0    0 00:48:28        8
-175.0.35.253    4       650002      19      19       32    0    0 00:06:40       13
-
+2.2.2.2         4        65000      54      55       24    0    0 00:43:20        4
+200.0.2.254     4       650002      57      55       24    0    0 00:43:56       11
+```
 ### 3. BFD Session Verification
 
-Verify sub-second path tracking state across the shared Layer 2 switch network. We see here that the Holdown is in miliseconds, allowing for faster convergence and almost instant fail-over. Sometimes this is needed in the case of a switch connecting two routers. Unless the routers are directly connected they will not know that others links went down until OSPF and BGP dead timers hit 0, which can be a long time by default. 
+Verify sub-second path tracking state across the shared Layer 2 switch network. We see here that packets are being sent at 300 ms with a multiplier 3, allowing for faster convergence and almost instant fail-over. Sometimes this is needed in the case of a switch connecting two routers. Unless the routers are directly connected they will not know that others links went down until OSPF or BGP dead timers hit 0, which can be a long time by default. 
 
 ```diff
 
@@ -108,4 +110,31 @@ Pro Inside global      Inside local       Outside local      Outside global
 icmp 192.0.35.3:20032  192.168.10.1:20032 8.8.8.8:20032      8.8.8.8:20032
 
 ```
+### 3. BGP Path Attribute Verification
+Verify that the Local Preference and prefix matching are successfully manipulating paths:
 
+```diff
+edge_router_1(config)#do sh ip bgp
+
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>   1.1.1.1/32       0.0.0.0                  0         32768 i
+ r>i  2.2.2.2/32       2.2.2.2                  0    100      0 i
++*>   3.3.3.3/32       200.0.2.254              0    130      0 650002 i
++*>   4.4.4.4/32       200.0.2.254              0    130      0 650002 i
++*>   5.5.5.5/32       200.0.2.254              0    130      0 650002 i
++*>   6.6.6.6/32       200.0.2.254              0    130      0 650002 i
++*>   7.7.7.7/32       200.0.2.254              0    130      0 650002 i
++*>   8.8.8.8/32       200.0.2.254              0    130      0 650002 i
++*>   9.9.9.9/32       200.0.2.254              0    130      0 650002 i
+ * i  10.10.10.8/30    2.2.2.2                  0    100      0 i
+ *>                    0.0.0.0                  0         32768 i
+ *>i  11.11.11.11/32   2.2.2.2                  0    100      0 650001 i
+ *>   158.0.0.35/32    200.0.2.254                   130      0 650002 650003 i
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>   158.0.35.160/30  200.0.2.254                   130      0 650002 650003 i
+ *>   175.0.35.252/30  200.0.2.254                   130      0 650002 650003 i
+ * i  192.0.35.0/29    2.2.2.2                  0    100      0 i
+ *>                    0.0.0.0                  0         32768 i
+ r>   200.0.2.252/30   200.0.2.254              0    130      0 650002 i
+```
+BGP decides what route is the best path by a checking a hierarchy of attributes. If a specific attribute breaks the tie than that route is selected. In this case the Local preference was changed from the default 100 to 130 forcing the router to prefer ISP-A, and this happens for edge-router-2 since they lie within the same Autonomous system, unlike weight which is local to the router. 
