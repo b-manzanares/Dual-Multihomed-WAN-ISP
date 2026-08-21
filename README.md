@@ -56,7 +56,7 @@ router bgp 65000
  neighbor 198.51.100.162 route-map route-map AS_prepend out
 ```
 
-We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS 65000 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS 650002 (ISP-A) listed as part of the path to network 203.0.113.1 & 203.0.113.2, our edge router 1 and 2 respectively.  
+We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS 65000 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS 650002 (ISP-A) listed as part of the path to network 203.0.113.1 & 203.0.113.2, our edge router 1 and 2 loopback interface ip addresses.  
 
 ```text
 inserthostname-here(config)#do sh bgp
