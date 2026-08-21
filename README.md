@@ -33,11 +33,11 @@ This project simulates an enterprise network connecting to two Internet Service 
 
 ## Device Configurations
 
-Enterprise Edge (Primary): Edge-Router-01.txt — Handles primary internet outbound traffic. <br>
-Enterprise Edge (Secondary): Edge-Router-02.txt — Acts as the secondary internet gateway. <br>
-Internal "Firewall": Firewall.txt — Manages NAT/PAT. <br>
-Service Provider Gateway A: ISP-A-Router.txt — Simulates primary upstream ISP peering. <br>
-Service Provider Gateway B: ISP-B-Router.txt — Simulates secondary backup ISP peering. <br>
+Enterprise Edge (Primary): [Edge-Router-01.txt](config/edge-router-1) — Handles primary internet outbound traffic. <br>
+Enterprise Edge (Secondary): [Edge-Router-02.txt](config/edge-router-2) — Acts as the secondary internet gateway. <br>
+Internal "Firewall": [Firewall.txt](config/firewall) — Manages NAT/PAT. <br>
+Service Provider Gateway A: [ISP-A-Router.txt](config/ISP-A) — Simulates primary upstream ISP peering. <br>
+Service Provider Gateway B: [ISP-B-Router.txt](config/ISP-B) — Simulates secondary backup ISP peering. <br>
 
 ## ☑️Configuration & Verification Snippets
 
