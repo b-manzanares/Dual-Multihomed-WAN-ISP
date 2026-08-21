@@ -1,0 +1,158 @@
+!
+hostname Firewall
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 20.20.20.20 255.255.255.255
+!
+interface Loopback2
+ no ip address
+!
+interface GigabitEthernet0/0
+ description *Link to VLAN 10*
+ ip address 10.10.10.2 255.255.255.252
+ ip nat inside
+ ip virtual-reassembly in
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description *Link to VLAN 20*
+ ip address 10.10.10.6 255.255.255.252
+ ip nat inside
+ ip virtual-reassembly in
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ description *Link to Switch > Edge Routers*
+ ip address 192.0.2.3 255.255.255.248
+ ip nat outside
+ ip virtual-reassembly in
+ ip ospf bfd
+ duplex auto
+ speed auto
+ media-type rj45
+ bfd interval 300 min_rx 300 multiplier 3
+!
+interface GigabitEthernet0/3
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router ospf 110
+ router-id 20.20.20.20
+ network 20.20.20.20 0.0.0.0 area 0
+ network 192.0.2.0 0.0.0.7 area 0
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip nat inside source list vlan_10 interface GigabitEthernet0/2 overload
+ip nat inside source list vlan_20 interface GigabitEthernet0/2 overload
+ip route 192.168.10.0 255.255.255.0 GigabitEthernet0/0
+ip route 192.168.10.0 255.255.255.0 10.10.10.5 2
+ip route 192.168.20.0 255.255.255.0 GigabitEthernet0/1
+!
+ip access-list standard vlan_10
+ permit 192.168.10.0 0.0.0.255
+ip access-list standard vlan_20
+ permit 192.168.20.0 0.0.0.255
+!
+ipv6 ioam timestamp
+!
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+no scheduler allocate
+!
+end
