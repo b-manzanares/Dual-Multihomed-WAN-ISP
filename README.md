@@ -28,7 +28,7 @@ This project simulates an enterprise network connecting to two Internet Service 
 
 [Below is the structural layout of the simulated enterprise edge environment, showcasing dual multihomed wan/isp setup]
 
-<img width="1853" height="963" alt="topology" src="https://github.com/user-attachments/assets/62bc73e5-79e3-4771-826f-765e909d55ab" />
+<img width="1857" height="816" alt="Screenshot 2026-08-20 at 19-30-16 BGP   HSRP CML²" src="https://github.com/user-attachments/assets/09cb9e24-e48b-4dfb-a7ed-14f6ffd578b9" />
 
 
 ## Device Configurations
