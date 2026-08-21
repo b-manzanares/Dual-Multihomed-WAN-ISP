@@ -2,7 +2,7 @@
 
 ## 🎯 Objective
 
-This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. This typically happens when a company owns a /24 block of public ip addresses and an AS number, and need to provide their IP's to both ISPs, so they can dynamically discover routes. The question I was trying to answer was "how would you create a redundant network, that provides access to the internet even if an ISP goes down?"
+This project simulates an enterprise network connecting to two Internet Service Providers (ISPs) using BGP. This typically happens when a company owns a /24 block of public ip addresses and an AS number, and needs to provide their IP's to both ISPs, so they can dynamically discover routes. The question I was trying to answer was "how would you create a redundant network, that provides access to the internet even if an ISP goes down?"
 
 * Configured eBGP and iBGP for dynamic routing & redundancy.
 * Manipulated path selection via local preference and AS-path prepending.
