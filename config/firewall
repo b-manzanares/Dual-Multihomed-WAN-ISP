@@ -51,7 +51,7 @@ redundancy
 !
 !
 interface Loopback0
- ip address 20.20.20.20 255.255.255.255
+ ip address 203.0.113.20 255.255.255.255
 !
 interface Loopback2
  no ip address
@@ -93,8 +93,8 @@ interface GigabitEthernet0/3
  media-type rj45
 !
 router ospf 110
- router-id 20.20.20.20
- network 20.20.20.20 0.0.0.0 area 0
+ router-id 203.0.113.20
+ network 203.0.113.20 0.0.0.0 area 0
  network 192.0.2.0 0.0.0.7 area 0
 !
 ip forward-protocol nd
