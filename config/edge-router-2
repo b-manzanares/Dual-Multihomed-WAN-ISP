@@ -51,7 +51,7 @@ redundancy
 !
 !
 interface Loopback2
- ip address 2.2.2.2 255.255.255.255
+ ip address 203.0.113.2 255.255.255.255
 !
 interface GigabitEthernet0/0
  description *Link > Switch > Firewall & Edge Router 1
@@ -84,19 +84,19 @@ interface GigabitEthernet0/3
  media-type rj45
 !
 router ospf 110
- network 2.2.2.2 0.0.0.0 area 0
+ network 203.0.113.2 0.0.0.0 area 0
  network 10.10.10.8 0.0.0.3 area 0
  network 192.0.2.0 0.0.0.7 area 0
  default-information originate always metric 50
 !
-router bgp 65000
+router bgp 64500
  bgp log-neighbor-changes
- network 2.2.2.2 mask 255.255.255.255
+ network 203.0.113.2 mask 255.255.255.255
  network 10.10.10.8 mask 255.255.255.252
  network 192.0.2.0 mask 255.255.255.248
- neighbor 1.1.1.1 remote-as 65000
- neighbor 1.1.1.1 update-source Loopback2
- neighbor 1.1.1.1 next-hop-self
+ neighbor 203.0.113.1 remote-as 65000
+ neighbor 203.0.113.1 update-source Loopback2
+ neighbor 203.0.113.1 next-hop-self
  neighbor 198.51.100.162 remote-as 650001
  neighbor 198.51.100.162 fall-over bfd
  neighbor 198.51.100.162 route-map AS_prepend out
@@ -110,7 +110,7 @@ no ip http secure-server
 ipv6 ioam timestamp
 !
 route-map AS_prepend permit 20
- set as-path prepend 65000 65000 65000
+ set as-path prepend 64500 64500 64500
 !
 !
 !
