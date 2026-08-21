@@ -1,0 +1,155 @@
+!
+hostname edge_router_2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback2
+ ip address 2.2.2.2 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description *Link > Switch > Firewall & Edge Router 1
+ ip address 192.0.2.2 255.255.255.248
+ ip ospf bfd
+ ip ospf cost 20
+ duplex auto
+ speed auto
+ media-type rj45
+ bfd interval 300 min_rx 300 multiplier 3
+!
+interface GigabitEthernet0/1
+ ip address 198.51.100.161 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+ bfd interval 300 min_rx 300 multiplier 3
+!
+interface GigabitEthernet0/2
+ ip address 10.10.10.10 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router ospf 110
+ network 2.2.2.2 0.0.0.0 area 0
+ network 10.10.10.8 0.0.0.3 area 0
+ network 192.0.2.0 0.0.0.7 area 0
+ default-information originate always metric 50
+!
+router bgp 65000
+ bgp log-neighbor-changes
+ network 2.2.2.2 mask 255.255.255.255
+ network 10.10.10.8 mask 255.255.255.252
+ network 192.0.2.0 mask 255.255.255.248
+ neighbor 1.1.1.1 remote-as 65000
+ neighbor 1.1.1.1 update-source Loopback2
+ neighbor 1.1.1.1 next-hop-self
+ neighbor 198.51.100.162 remote-as 650001
+ neighbor 198.51.100.162 fall-over bfd
+ neighbor 198.51.100.162 route-map AS_prepend out
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 ioam timestamp
+!
+route-map AS_prepend permit 20
+ set as-path prepend 65000 65000 65000
+!
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+no scheduler allocate
+!
+end
