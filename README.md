@@ -109,7 +109,7 @@ Verify that the Gateway Router is actively translating private IP traffic to pub
 Gateway Router(config)#do sh ip nat translations
 
 Pro Inside global      Inside local       Outside local      Outside global
-icmp 192.0.2.3:20032  192.168.10.1:20032 8.8.8.8:20032      8.8.8.8:20032
+icmp 192.0.2.3:20032  192.168.10.1:20032 203.0.113.8:20032      203.0.113.8:20032
 
 ```
 ### 3. BGP Path Attribute Verification
