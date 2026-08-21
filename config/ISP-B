@@ -50,28 +50,28 @@ redundancy
 !
 !
 interface Loopback3
- ip address 3.3.3.3 255.255.255.255
+ ip address 203.0.113.3 255.255.255.255
 !
 interface Loopback4
- ip address 4.4.4.4 255.255.255.255
+ ip address 203.0.113.4 255.255.255.255
 !
 interface Loopback5
- ip address 5.5.5.5 255.255.255.255
+ ip address 203.0.113.5 255.255.255.255
 !
 interface Loopback6
- ip address 6.6.6.6 255.255.255.255
+ ip address 203.0.113.6 255.255.255.255
 !
 interface Loopback7
- ip address 7.7.7.7 255.255.255.255
+ ip address 203.0.113.7 255.255.255.255
 !
 interface Loopback8
- ip address 8.8.8.8 255.255.255.255
+ ip address 203.0.113.8 255.255.255.255
 !
 interface Loopback9
- ip address 9.9.9.9 255.255.255.255
+ ip address 203.0.113.9 255.255.255.255
 !
 interface Loopback11
- ip address 11.11.11.11 255.255.255.255
+ ip address 203.0.113.11 255.255.255.255
 !
 interface GigabitEthernet0/0
  ip address 198.51.100.162 255.255.255.252
@@ -103,14 +103,14 @@ interface GigabitEthernet0/3
 !
 router bgp 650001
  bgp log-neighbor-changes
- network 3.3.3.3 mask 255.255.255.255
- network 4.4.4.4 mask 255.255.255.255
- network 5.5.5.5 mask 255.255.255.255
- network 6.6.6.6 mask 255.255.255.255
- network 7.7.7.7 mask 255.255.255.255
- network 8.8.8.8 mask 255.255.255.255
- network 9.9.9.9 mask 255.255.255.255
- network 11.11.11.11 mask 255.255.255.255
+ network 203.0.113.3 mask 255.255.255.255
+ network 203.0.113.4 mask 255.255.255.255
+ network 203.0.113.5 mask 255.255.255.255
+ network 203.0.113.6 mask 255.255.255.255
+ network 203.0.113.7 mask 255.255.255.255
+ network 203.0.113.8 mask 255.255.255.255
+ network 203.0.113.9 mask 255.255.255.255
+ network 203.0.113.11 mask 255.255.255.255
  neighbor 198.51.100.166 remote-as 650003
  neighbor 198.51.100.161 remote-as 65000
  neighbor 198.51.100.161 fall-over bfd
