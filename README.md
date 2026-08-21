@@ -55,14 +55,14 @@ router bgp 65000
  neighbor 198.51.100.162 route-map route-map AS_prepend out
 ```
 
-We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS 65000 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS 650002 (ISP-A) listed as part of the path to network 1.1.1.1 & 2.2.2.2, our edge router 1 and 2 respectively.  
+We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS 65000 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS 650002 (ISP-A) listed as part of the path to network 203.0.113.1 & 203.0.113.2, our edge router 1 and 2 respectively.  
 
 ```text
 inserthostname-here(config)#do sh bgp
 
      Network          Next Hop            Metric LocPrf Weight Path
- *>   1.1.1.1/32       203.0.113.249                           0 650002 65000 i
- *>   2.2.2.2/32       203.0.113.249                           0 650002 65000 i
+ *>   203.0.113.1/32       203.0.113.249                           0 650002 65000 i
+ *>   203.0.113.2/32       203.0.113.249                           0 650002 65000 i
 ```
 
 Now if we shutdown the link to ISP-A (ASp650002), our route to ISP-B (AS-650001) takes over and shows up in the path. We see the path includes AS 650001, the Autonomous system ISP-B belongs too. Here is the output: 
@@ -71,8 +71,8 @@ Now if we shutdown the link to ISP-A (ASp650002), our route to ISP-B (AS-650001)
 inserthostname-here(config)#do sh bgp
 
      Network          Next Hop            Metric LocPrf Weight Path
-+ *>   1.1.1.1/32       198.51.100.165                           0 650001 65000 65000 65000 65000 i
-+ *>   2.2.2.2/32       198.51.100.165                           0 650001 65000 65000 65000 65000 i
++ *>   203.0.113.1/32       198.51.100.165                           0 650001 65000 65000 65000 65000 i
++ *>   203.0.113.2/32       198.51.100.165                           0 650001 65000 65000 65000 65000 i
 ```
 
 ### 2. Verification of BGP Neighbor States
@@ -119,23 +119,23 @@ Verify that the Local Preference and prefix matching are successfully manipulati
 edge_router_1(config)#do sh ip bgp
 
      Network          Next Hop            Metric LocPrf Weight Path
- *>   1.1.1.1/32       0.0.0.0                  0         32768 i
- r>i  2.2.2.2/32       2.2.2.2                  0    100      0 i
-+*>   3.3.3.3/32       203.0.113.254              0    130      0 650002 i
-+*>   4.4.4.4/32       203.0.113.254              0    130      0 650002 i
-+*>   5.5.5.5/32       203.0.113.254              0    130      0 650002 i
-+*>   6.6.6.6/32       203.0.113.254              0    130      0 650002 i
-+*>   7.7.7.7/32       203.0.113.254              0    130      0 650002 i
-+*>   8.8.8.8/32       203.0.113.254              0    130      0 650002 i
-+*>   9.9.9.9/32       203.0.113.254              0    130      0 650002 i
+ *>   203.0.113.1/32       0.0.0.0                  0         32768 i
+ r>i  203.0.113.2/32       203.0.113.2                  0    100      0 i
++*>   203.0.113.3/32       203.0.113.254              0    130      0 650002 i
++*>   203.0.113.4/32       203.0.113.254              0    130      0 650002 i
++*>   203.0.113.5/32       203.0.113.254              0    130      0 650002 i
++*>   203.0.113.6/32       203.0.113.254              0    130      0 650002 i
++*>   203.0.113.7/32       203.0.113.254              0    130      0 650002 i
++*>   203.0.113.8/32       203.0.113.254              0    130      0 650002 i
++*>   203.0.113.9/32       203.0.113.254              0    130      0 650002 i
  * i  10.10.10.8/30    2.2.2.2                  0    100      0 i
  *>                    0.0.0.0                  0         32768 i
- *>i  11.11.11.11/32   2.2.2.2                  0    100      0 650001 i
+ *>i  203.0.113.11/32   2.2.2.2                  0    100      0 650001 i
  *>   192.0.35.35/32    203.0.113.254                  130      0 650002 650003 i
      Network          Next Hop            Metric LocPrf Weight Path
  *>   198.51.100.164/30  203.0.113.254                   130      0 650002 650003 i
  *>   198.51.100.160/30  203.0.113.254                   130      0 650002 650003 i
- * i  192.0.35.0/29    2.2.2.2                  0    100      0 i
+ * i  192.0.35.0/29    203.0.113.2                  0    100      0 i
  *>                    0.0.0.0                  0         32768 i
  r>   203.0.113.252/30   203.0.113.254              0    130      0 650002 i
 ```
