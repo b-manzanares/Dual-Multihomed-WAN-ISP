@@ -52,7 +52,7 @@ route-map AS_prepend permit 20
  set as-path prepend 65000 65000 65000
 !
 router bgp 65000
- neighbor 173.58.16.162 route-map route-map AS_prepend out
+ neighbor 198.51.100.162 route-map route-map AS_prepend out
 ```
 
 We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS 65000 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS 650002 (ISP-A) listed as part of the path to network 1.1.1.1 & 2.2.2.2, our edge router 1 and 2 respectively.  
@@ -61,8 +61,8 @@ We use out at the end of the route-map because we want routers on the ISP side t
 inserthostname-here(config)#do sh bgp
 
      Network          Next Hop            Metric LocPrf Weight Path
- *>   1.1.1.1/32       175.0.35.253                           0 650002 65000 i
- *>   2.2.2.2/32       175.0.35.253                           0 650002 65000 i
+ *>   1.1.1.1/32       203.0.113.249                           0 650002 65000 i
+ *>   2.2.2.2/32       203.0.113.249                           0 650002 65000 i
 ```
 
 Now if we shutdown the link to ISP-A (ASp650002), our route to ISP-B (AS-650001) takes over and shows up in the path. We see the path includes AS 650001, the Autonomous system ISP-B belongs too. Here is the output: 
@@ -71,8 +71,8 @@ Now if we shutdown the link to ISP-A (ASp650002), our route to ISP-B (AS-650001)
 inserthostname-here(config)#do sh bgp
 
      Network          Next Hop            Metric LocPrf Weight Path
-+ *>   1.1.1.1/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
-+ *>   2.2.2.2/32       158.0.35.161                           0 650001 65000 65000 65000 65000 i
++ *>   1.1.1.1/32       198.51.100.165                           0 650001 65000 65000 65000 65000 i
++ *>   2.2.2.2/32       198.51.100.165                           0 650001 65000 65000 65000 65000 i
 ```
 
 ### 2. Verification of BGP Neighbor States
@@ -83,8 +83,8 @@ Running show ip bgp summary confirms that peerings are properly established (Sta
 inserthostname-here(config)#do sh ip bgp sum
 
 Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-2.2.2.2         4        65000      54      55       24    0    0 00:43:20        4
-200.0.2.254     4       650002      57      55       24    0    0 00:43:56       11
+198.51.100.165    4       650001      49      49       17    0    0 00:39:14        8
+203.0.113.249    4       650002      51      49       17    0    0 00:39:10        13
 ```
 ### 3. BFD Session Verification
 
@@ -93,10 +93,10 @@ Verify sub-second path tracking state across the shared Layer 2 switch network. 
 ```diff
 
 NeighAddr                              LD/RD         RH/RS     State     Int
-200.0.2.254                             1/1          Up        Up        Gi0/1
+203.0.113.254                             1/1          Up        Up        Gi0/1
 +Session state is UP and using echo function with 300 ms interval.
 Session Host: Software
-OurAddr: 200.0.2.253
+OurAddr: 203.0.113.253
 Handle: 1
 Local Diag: 0, Demand mode: 0, Poll bit: 0
 +MinTxInt: 1000000, MinRxInt: 1000000, Multiplier: 3
@@ -109,7 +109,7 @@ Verify that the Gateway Router is actively translating private IP traffic to pub
 Gateway Router(config)#do sh ip nat translations
 
 Pro Inside global      Inside local       Outside local      Outside global
-icmp 192.0.35.3:20032  192.168.10.1:20032 8.8.8.8:20032      8.8.8.8:20032
+icmp 192.0.2.3:20032  192.168.10.1:20032 8.8.8.8:20032      8.8.8.8:20032
 
 ```
 ### 3. BGP Path Attribute Verification
@@ -121,22 +121,22 @@ edge_router_1(config)#do sh ip bgp
      Network          Next Hop            Metric LocPrf Weight Path
  *>   1.1.1.1/32       0.0.0.0                  0         32768 i
  r>i  2.2.2.2/32       2.2.2.2                  0    100      0 i
-+*>   3.3.3.3/32       200.0.2.254              0    130      0 650002 i
-+*>   4.4.4.4/32       200.0.2.254              0    130      0 650002 i
-+*>   5.5.5.5/32       200.0.2.254              0    130      0 650002 i
-+*>   6.6.6.6/32       200.0.2.254              0    130      0 650002 i
-+*>   7.7.7.7/32       200.0.2.254              0    130      0 650002 i
-+*>   8.8.8.8/32       200.0.2.254              0    130      0 650002 i
-+*>   9.9.9.9/32       200.0.2.254              0    130      0 650002 i
++*>   3.3.3.3/32       203.0.113.254              0    130      0 650002 i
++*>   4.4.4.4/32       203.0.113.254              0    130      0 650002 i
++*>   5.5.5.5/32       203.0.113.254              0    130      0 650002 i
++*>   6.6.6.6/32       203.0.113.254              0    130      0 650002 i
++*>   7.7.7.7/32       203.0.113.254              0    130      0 650002 i
++*>   8.8.8.8/32       203.0.113.254              0    130      0 650002 i
++*>   9.9.9.9/32       203.0.113.254              0    130      0 650002 i
  * i  10.10.10.8/30    2.2.2.2                  0    100      0 i
  *>                    0.0.0.0                  0         32768 i
  *>i  11.11.11.11/32   2.2.2.2                  0    100      0 650001 i
- *>   158.0.0.35/32    200.0.2.254                   130      0 650002 650003 i
+ *>   158.0.0.35/32    203.0.113.254                  130      0 650002 650003 i
      Network          Next Hop            Metric LocPrf Weight Path
- *>   158.0.35.160/30  200.0.2.254                   130      0 650002 650003 i
- *>   175.0.35.252/30  200.0.2.254                   130      0 650002 650003 i
+ *>   158.0.35.160/30  203.0.113.254                   130      0 650002 650003 i
+ *>   198.51.100.160/30  203.0.113.254                   130      0 650002 650003 i
  * i  192.0.35.0/29    2.2.2.2                  0    100      0 i
  *>                    0.0.0.0                  0         32768 i
- r>   200.0.2.252/30   200.0.2.254              0    130      0 650002 i
+ r>   203.0.113.252/30   203.0.113.254              0    130      0 650002 i
 ```
 BGP decides what route is the best path by a checking a hierarchy of attributes. If a specific attribute breaks the tie than that route is selected. In this case the Local preference was changed from the default 100 to 130 forcing the router to prefer ISP-A, and this happens for edge-router-2 since they lie within the same Autonomous system, unlike weight which is local to the router. 
