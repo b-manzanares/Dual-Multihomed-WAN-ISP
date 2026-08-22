@@ -52,11 +52,11 @@ To prevent ISP-B from being used for inbound corporate traffic during normal ope
 route-map AS_prepend permit 20
  set as-path prepend 64500 64500 64500
 !
-router bgp 65000
+router bgp 64500
  neighbor 198.51.100.162 route-map route-map AS_prepend out
 ```
 
-We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS 65000 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS 650002 (ISP-A) listed as part of the path to network 203.0.113.1 & 203.0.113.2, our edge router 1 and 2 loopback interface ip addresses.  
+We use out at the end of the route-map because we want routers on the ISP side to believe that it is receiving a longer path to AS-64500 (Edge-router 1 or 2), from edge-router-02. This influences what route is picked as the best path in BGP, since the router will chose a lower AS path length.  If we check the output we see AS-64502 (ISP-A) listed as part of the path to network 203.0.113.1 & 203.0.113.2, our edge router 1 and 2 loopback interface ip addresses.  
 
 ```text
 inserthostname-here(config)#do sh bgp
@@ -66,7 +66,7 @@ inserthostname-here(config)#do sh bgp
  *>   203.0.113.2/32       203.0.113.249                           0 64502 64500 i
 ```
 
-Now if we shutdown the link to ISP-A (ASp650002), our route to ISP-B (AS-650001) takes over and shows up in the path. We see the path includes AS 650001, the Autonomous system ISP-B belongs too. Here is the output: 
+Now if we shutdown the link to ISP-A (AS-64502), our route to ISP-B (AS-64501) takes over and shows up in the path. We see the path includes AS-64501, the Autonomous system ISP-B belongs too. Here is the output: 
 
 ```diff
 inserthostname-here(config)#do sh bgp
